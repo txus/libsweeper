@@ -1,7 +1,7 @@
 # libsweeper
 
 An simple implementation of a Mark and Sweep garbage collector, used in
-[TerrorVM][terror] but completely agnostic.
+[TerrorVM][terrorvm] but completely agnostic.
 
 ## Using
 
@@ -141,6 +141,18 @@ To build libsweeper and run its test suite:
     $ cd libsweeper
     $ make
 
+If you want to run with Valgrind to ensure there are no memory leaks:
+
+    $ make valgrind
+
+Tested in Mac OSX 10.8.
+
+## Who's this
+
+This was made by [Josep M. Bach (Txus)](http://txustice.me) under the MIT
+license. I'm [@txustice][twitter] on twitter (where you should probably follow
+me!).
+
 ## Contributing
 
 1. Fork it
@@ -149,5 +161,6 @@ To build libsweeper and run its test suite:
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
+[twitter]: https://twitter.com/txustice
 [terrorvm]: https://github.com/txus/terrorvm
 [tests]: https://github.com/txus/libsweeper/blob/master/tests/sweeper_tests.c
