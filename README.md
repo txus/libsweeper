@@ -42,6 +42,8 @@ header field in your **object** struct (or values or however you call them).
 As easily seen [in the tests][tests], here's an example Object struct:
 
 ```c
+#include <sweeper/header.h>
+
 typedef struct Object_s {
   SWPHeader gc;
   ... // your own things
@@ -67,6 +69,8 @@ object header, whereas the latter is a collection of object headers.
 Here's an example of how those functions might look:
 
 ```c
+#include <sweeper/header.h>
+
 // Function to destroy an object
 void my_destroy(SWPHeader *obj) {
   free(obj);
@@ -93,6 +97,7 @@ void my_add_children(SWPHeader *obj, SWPHeaders *children) {
 Here's the signature of the constructor function for an SWPHeap:
 
 ```c
+// in <sweeper/sweeper.h>
 SWPHeap* SWPHeap_new(
   unsigned int size,
   unsigned int max_size,
