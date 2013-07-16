@@ -60,10 +60,10 @@ You need to provide three custom functions for the GC to work:
 
 * A function to **destroy** an object of yours, with signature `void (SWPHeader*)`
 * A function to **determine the rootset**, with signature `void (void*,
-  SWPHeaders*)`
-* A function to **determine the references of an object**, with signature `void (SWPHeader*, SWPHeaders*)`
+  SWPArray*)`
+* A function to **determine the references of an object**, with signature `void (SWPHeader*, SWPArray*)`
 
-Note the difference between `SWPHeader` and `SWPHeaders`. The former is an
+Note the difference between `SWPHeader` and `SWPArray`. The former is an
 object header, whereas the latter is a collection of object headers.
 
 Here's an example of how those functions might look:
@@ -77,18 +77,18 @@ void my_destroy(SWPHeader *obj) {
 }
 
 // Function to determine the rootset
-void my_add_roots(void *state, SWPHeaders *roots) {
+void my_add_roots(void *state, SWPArray *roots) {
   State *my_state = (State*)state;
   // find out the rootset, scanning the stack, global variables, etc
   // and for each result do:
-  SWPHeaders_push(roots, (SWPHeader*)object);
+  SWPArray(roots, object);
 }
 
 // Function to determine the references of an object
-void my_add_children(SWPHeader *obj, SWPHeaders *children) {
+void my_add_children(SWPHeader *obj, SWPArray *children) {
   Object *object = (Object*)obj;
   // find out the objects referenced by `object` and for each do:
-  SWPHeaders_push(children, referenced_object);
+  SWPArray_push(children, referenced_object);
 }
 ```
 

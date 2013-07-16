@@ -19,14 +19,14 @@ void test_release(SWPHeader *obj) {
   obj = NULL;
 }
 
-void test_add_roots(void *state, SWPHeaders *roots) {
-  SWPHeaders_push(roots, foo);
-  SWPHeaders_push(roots, quux);
+void test_add_roots(void *state, SWPArray *roots) {
+  SWPArray_push(roots, foo);
+  SWPArray_push(roots, quux);
 }
 
-void test_add_children(SWPHeader *obj, SWPHeaders *children) {
+void test_add_children(SWPHeader *obj, SWPArray *children) {
   if(obj == foo) {
-    SWPHeaders_push(children, bar);
+    SWPArray_push(children, bar);
   }
 }
 

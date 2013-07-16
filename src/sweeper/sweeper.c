@@ -7,7 +7,7 @@ void SWPHeap_print(SWPHeap *heap) {
     heap->size,
     sizeof(SWPHeader*) * heap->size,
     heap->collections
-  );
+    );
 
   printf("HEAP\n");
   for(int i=0; i < heap->size; i++) {
@@ -78,38 +78,38 @@ void SWPHeap_destroy(SWPHeap *heap) {
   free(heap);
 }
 
-void swp_mark(SWPHeap *heap, SWPHeaders *worklist) {
-  while(!SWPHeaders_is_empty(worklist)) {
-    SWPHeader *obj = SWPHeaders_pop(worklist);
+void swp_mark(SWPHeap *heap, SWPArray *worklist) {
+  while(!SWPArray_is_empty(worklist)) {
+    SWPHeader *obj = SWPArray_pop(worklist);
 
-    SWPHeaders *children = SWPHeaders_new();
+    SWPArray *children = SWPArray_create(sizeof(SWPHeader*), SWPARRAY_DEFAULT_SIZE);
     heap->add_children(obj, children);
-    for(int i = 0; i < children->size; i++) {
-      SWPHeader *child = children->objects[i];
+    for(int i = 0; i < children->end; i++) {
+      SWPHeader *child = (SWPHeader*)SWPArray_at(children, i);
       if(child && !SWPHeader_is_marked(child)) {
         SWPHeader_mark(child);
-        SWPHeaders_push(worklist, child);
+        SWPArray_push(worklist, child);
       }
     }
-    SWPHeaders_destroy(children);
+    SWPArray_destroy(children);
   }
 }
 
 void swp_mark_from_roots(SWPHeap *heap) {
-  SWPHeaders *worklist = SWPHeaders_new();
-  SWPHeaders *roots = SWPHeaders_new();
+  SWPArray *worklist = SWPArray_create(sizeof(SWPHeader*), SWPARRAY_DEFAULT_SIZE);
+  SWPArray *roots = SWPArray_create(sizeof(SWPHeader*), SWPARRAY_DEFAULT_SIZE);
   heap->add_roots(heap->state, roots);
 
-  for(int i=0; i < roots->size; i++) {
-    SWPHeader *obj = roots->objects[i];
+  for(int i=0; i < SWPArray_count(roots); i++) {
+    SWPHeader *obj = (SWPHeader*)SWPArray_at(roots, i);
     if(obj && !SWPHeader_is_marked(obj)) {
       SWPHeader_mark(obj);
-      SWPHeaders_push(worklist, obj);
+      SWPArray_push(worklist, obj);
       swp_mark(heap, worklist);
     }
   }
-  SWPHeaders_destroy(worklist);
-  SWPHeaders_destroy(roots);
+  SWPArray_destroy(worklist);
+  SWPArray_destroy(roots);
 }
 
 void swp_sweep(SWPHeap *heap) {

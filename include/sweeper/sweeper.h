@@ -2,10 +2,11 @@
 #define _SWEEPER_SWEEPER_H_
 
 #include <sweeper/header.h>
+#include <sweeper/array.h>
 
 typedef void (*SWPReleaseFn)(SWPHeader*);
-typedef void (*SWPAddRootsFn)(void*, SWPHeaders*);
-typedef void (*SWPAddChildrenFn)(SWPHeader*, SWPHeaders*);
+typedef void (*SWPAddRootsFn)(void*, SWPArray*);
+typedef void (*SWPAddChildrenFn)(SWPHeader*, SWPArray*);
 
 typedef struct SWPHeap_s {
   void *state;
