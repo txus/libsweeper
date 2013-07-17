@@ -11,9 +11,8 @@ typedef void (*SWPAddChildrenFn)(SWPHeader*, SWPArray*);
 typedef struct SWPHeap_s {
   void *state;
   SWPHeader **objects;
-  unsigned int size;
-  unsigned int max_size;
-  double growth_factor;
+  size_t size;
+  size_t expand_rate;
   unsigned int collections;
   SWPReleaseFn release;
   SWPAddRootsFn add_roots;
@@ -23,9 +22,8 @@ typedef struct SWPHeap_s {
 } SWPHeap;
 
 SWPHeap* SWPHeap_new(
-  unsigned int size,
-  unsigned int max_size,
-  double growth_factor,
+  size_t size,
+  size_t expand_rate,
   void *state,
   size_t object_size,
   SWPReleaseFn release,
@@ -36,7 +34,7 @@ SWPHeap* SWPHeap_new(
 #define SWPHeap_disable(A) (A)->enabled = 0
 #define SWPHeap_enable(A) (A)->enabled = 1
 void SWPHeap_print(SWPHeap*);
-void SWPHeap_grow(SWPHeap*);
+int SWPHeap_expand(SWPHeap*);
 void SWPHeap_destroy(SWPHeap*);
 SWPHeader* swp_allocate(SWPHeap*);
 void swp_mark_from_roots(SWPHeap *heap);

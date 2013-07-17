@@ -3,9 +3,9 @@
 #include <sweeper/sweeper.h>
 
 void SWPHeap_print(SWPHeap *heap) {
-  printf("SIZE (%i objects, %ld bytes); COLLECTIONS %i\n",
+  printf("SIZE (%li objects, %ld bytes); COLLECTIONS %i\n",
     heap->size,
-    sizeof(SWPHeader*) * heap->size,
+    heap->size * heap->object_size,
     heap->collections
     );
 
@@ -15,37 +15,42 @@ void SWPHeap_print(SWPHeap *heap) {
   }
 }
 
-void SWPHeap_grow(SWPHeap *heap) {
-  int new_objs = heap->size * heap->growth_factor;
+static inline int SWPHeap_resize(SWPHeap *heap, size_t newsize)
+{
+  heap->size = newsize;
+  check(heap->size > 0, "The newsize must be > 0.");
 
-  check(new_objs <= heap->max_size, "Heap max size exhausted.");
+  SWPHeader **objects = realloc(heap->objects, heap->size * sizeof(SWPHeader*));
+  // check contents and assume realloc doesn't harm the original on error
 
-  size_t before = sizeof(SWPHeap*) * heap->size;
+  check_mem(objects);
 
-  SWPHeader **new_space = realloc(heap->objects, new_objs * sizeof(SWPHeader*));
-  check_mem(new_space);
+  heap->objects = objects;
 
-  // Set the newly grown region to zeros
-  size_t offset = ((new_objs + 1) * sizeof(SWPHeader*)) - before;
-  SWPHeader **start = new_space;
-  int count = heap->size;
-  while(--count) start++;
-  memset(start, 0, offset);
+  return 0;
+error:
+  return -1;
+}
 
-  heap->objects = new_space;
-  heap->size = new_objs;
+int SWPHeap_expand(SWPHeap *heap)
+{
+  size_t old_size = heap->size;
+  check(SWPHeap_resize(heap, heap->size + heap->expand_rate) == 0,
+    "Failed to expand heap to new size: %ld",
+    heap->size + (int)heap->expand_rate);
 
-  return;
+  SWPHeader **ptr = heap->objects;
+  while(old_size--) ptr++;
+  memset(ptr, 0, (heap->expand_rate) * sizeof(SWPHeader*));
+  return 0;
 
 error:
-  fprintf(stderr, "Out of memory.");
-  exit(1);
+  return -1;
 }
 
 SWPHeap* SWPHeap_new(
-  unsigned int amount,
-  unsigned int max_size,
-  double growth_factor,
+  size_t size,
+  size_t expand_rate,
   void *state,
   size_t object_size,
   SWPReleaseFn release_fn,
@@ -53,13 +58,13 @@ SWPHeap* SWPHeap_new(
   SWPAddChildrenFn add_children_fn
   ) {
   SWPHeap *heap = calloc(1, sizeof(SWPHeap));
-  heap->objects = calloc(amount, sizeof(SWPHeader*));
+
+  heap->objects = calloc(size, sizeof(SWPHeader*));
 
   heap->state = state;
   heap->object_size = object_size;
-  heap->size = amount;
-  heap->max_size = max_size;
-  heap->growth_factor = growth_factor;
+  heap->size = size;
+  heap->expand_rate = expand_rate;
   heap->release = release_fn;
   heap->add_roots = add_roots_fn;
   heap->add_children = add_children_fn;
@@ -139,6 +144,6 @@ SWPHeader* swp_allocate(SWPHeap *heap) {
   if(heap->enabled) {
     swp_collect(heap);
   }
-  SWPHeap_grow(heap);
+  SWPHeap_expand(heap);
   return swp_allocate(heap);
 }

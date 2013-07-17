@@ -30,11 +30,10 @@ void test_add_children(SWPHeader *obj, SWPArray *children) {
   }
 }
 
-SWPHeap *new_heap(unsigned int size) {
+SWPHeap *new_heap(unsigned int objects) {
   return SWPHeap_new(
-    size,
-    size * 2,
-    1.8,
+    objects,
+    objects * 2,
     (void*)0x0, // state
     sizeof(Object),
     test_release,
@@ -52,10 +51,12 @@ char *test_heap_new() {
 }
 
 char *test_heap_allocate() {
-  SWPHeap *heap = new_heap(2);
+  SWPHeap *heap = new_heap(1);
 
   SWPHeader *obj = swp_allocate(heap);
   mu_assert(obj != NULL, "Couldn't allocate object");
+
+  free(obj);
 
   SWPHeap_destroy(heap);
   return NULL;
@@ -76,14 +77,18 @@ char *test_heap_mark_from_roots() {
   mu_assert(!SWPHeader_is_marked(baz), "Baz should not be marked");
   mu_assert(SWPHeader_is_marked(quux), "Quux should be marked");
 
+  free(foo);
+  free(bar);
+  free(baz);
+  free(quux);
   SWPHeap_destroy(heap);
   return NULL;
 }
 
-char *test_heap_grow() {
-  SWPHeap *heap = new_heap(3); // max_size == 6
-  SWPHeap_grow(heap);
-  mu_assert(heap->size == 5, "Wrong heap size");
+char *test_heap_expand() {
+  SWPHeap *heap = new_heap(3);
+  SWPHeap_expand(heap);
+  mu_assert(heap->size == 9, "Wrong heap size");
   SWPHeap_destroy(heap);
   return NULL;
 }
@@ -100,8 +105,12 @@ char *test_heap_collect() {
   mu_assert(x != NULL, "X couldn't be allocated");
 
   mu_assert(heap->collections == 1, "Collection wasn't triggered");
-  mu_assert(heap->size == 7, "Heap didn't grow");
+  mu_assert(heap->size == 12, "Heap didn't expand");
 
+  free(foo);
+  free(bar);
+  free(quux);
+  free(x);
   SWPHeap_destroy(heap);
   return NULL;
 }
@@ -111,7 +120,7 @@ char *all_tests() {
 
   mu_run_test(test_heap_new);
   mu_run_test(test_heap_allocate);
-  mu_run_test(test_heap_grow);
+  mu_run_test(test_heap_expand);
   mu_run_test(test_heap_mark_from_roots);
   mu_run_test(test_heap_collect);
 

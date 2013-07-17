@@ -99,9 +99,8 @@ Here's the signature of the constructor function for an SWPHeap:
 ```c
 // in <sweeper/sweeper.h>
 SWPHeap* SWPHeap_new(
-  unsigned int size,
-  unsigned int max_size,
-  double growth_factor,
+  size_t size,
+  size_t expand_rate,
   void *state,
   size_t object_size,
   SWPReleaseFn release,
@@ -111,9 +110,8 @@ SWPHeap* SWPHeap_new(
 ```
 
 * **size** is initial size of the heap, in number of objects.
-* **max_size** is the max size of the heap, in number of objects.
-* **growth_factor** is the factor at which the heap will grow after each
-  collection, to make collections less frequent. Set this to some sane value such as `1.8`.
+* **expand_rate** is the number of objects that the heap will be grown every
+  time there is a collection, to make collections less frequent.
 * **state** is a pointer to your State object or whatever you use to determine
   the rootset.
 * **object_size** is the size of your object struct, for example
