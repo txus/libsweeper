@@ -69,11 +69,6 @@ SWPHeap* SWPHeap_new(
 }
 
 void SWPHeap_destroy(SWPHeap *heap) {
-  for(int i=0; i < heap->size; i++) {
-    if(heap->objects[i]) {
-      heap->release(heap->objects[i]);
-    }
-  }
   if(heap->objects) free(heap->objects);
   free(heap);
 }
