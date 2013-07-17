@@ -138,6 +138,10 @@ And finally, at the end of your program, remember to destroy the heap:
 SWPHeap_destroy(heap);
 ```
 
+Destroying the heap **won't release** your live objects at that point. Make sure
+to empty the rootset and run a last `swp_collect(heap)` before you destroy the
+heap.
+
 ## Development
 
 To build libsweeper and run its test suite:
