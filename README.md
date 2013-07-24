@@ -1,4 +1,4 @@
-# libsweeper
+# libsweeper [![Build Status](https://travis-ci.org/txus/libsweeper.png)](https://travis-ci.org/txus/libsweeper)
 
 An simple implementation of a Mark and Sweep garbage collector, used in
 [TerrorVM][terrorvm] but completely agnostic.
