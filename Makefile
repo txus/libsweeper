@@ -1,4 +1,3 @@
-CC=clang
 CFLAGS=-g -O3 -std=c99 -Wall -Werror -Iinclude -DNDEBUG $(OPTFLAGS)
 LIBS=$(OPTLIBS)
 PREFIX?=/usr/local
