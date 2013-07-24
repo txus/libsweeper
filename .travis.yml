@@ -1,5 +1,5 @@
 language: c
-script: make valgrind
+script: sudo apt-get install valgrind; make valgrind
 compiler:
   - clang
   - gcc
