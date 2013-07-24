@@ -152,7 +152,7 @@ If you want to run with Valgrind to ensure there are no memory leaks:
 
     $ make valgrind
 
-Tested in Mac OSX 10.8.
+Tested in Mac OSX 10.8 and Linux.
 
 ## Who's this
 
